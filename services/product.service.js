@@ -39,9 +39,22 @@ async function updateProduct(id, updateData) {
     return products[index]
 }
 
+async function deleteProduct(id) {
+    const products = await db.readData()
+    const index = products.findIndex((item) => item.id === Number(id))
+    if (index === -1) {
+        return false
+    }
+
+    products.splice(index, 1)
+    await db.writeData(products)
+    return true
+}
+
 module.exports = {
     getAllProducts,
     getProductById,
     createProduct,
-    updateProduct
+    updateProduct,
+    deleteProduct
 }
