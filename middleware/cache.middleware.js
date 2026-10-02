@@ -10,11 +10,18 @@ function cacheMiddleware(req, res, next) {
         const age = currentTime - cachedItem.createdAt
 
         if (age < TTL) {
+            console.log(`Cache HIT: ${key} (age: ${(age / 1000).toFixed(1)}s)`)
+            res.setHeader('X-Cache', 'HIT')
+            res.setHeader('X-Cache-Age-Seconds', Math.floor(age / 1000))
             return res.json(cachedItem.data)
         } else {
+            console.log(`Cache EXPIRED: ${key}`)
             delete cache[key]
         }
     }
+
+    console.log(`Cache MISS: ${key}`)
+    res.setHeader('X-Cache', 'MISS')
 
     const originalJson = res.json.bind(res)
     res.json = (data) => {
@@ -31,6 +38,7 @@ function cacheMiddleware(req, res, next) {
 }
 
 function invalidateCache() {
+    console.log('Cache INVALIDATED')
     cache = {}
 }
 
