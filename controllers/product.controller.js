@@ -1,4 +1,5 @@
 const productService = require('../services/product.service')
+const { invalidateCache } = require('../middleware/cache.middleware')
 
 async function getProducts(req, res) {
     try {
@@ -25,6 +26,7 @@ async function getProductById(req, res) {
 async function createProduct(req, res) {
     try {
         const newProduct = await productService.createProduct(req.body)
+        invalidateCache()
         return res.status(201).json(newProduct)
     } catch (err) {
         return res.status(500).json({ error: err.message })
@@ -38,6 +40,7 @@ async function updateProduct(req, res) {
         if (!updated) {
             return res.status(404).json({ message: 'Product not found' })
         }
+        invalidateCache()
         return res.json(updated)
     } catch (err) {
         return res.status(500).json({ error: err.message })
@@ -51,6 +54,7 @@ async function deleteProduct(req, res) {
         if (!deleted) {
             return res.status(404).json({ message: 'Product not found' })
         }
+        invalidateCache()
         return res.json({ message: 'Product deleted successfully' })
     } catch (err) {
         return res.status(500).json({ error: err.message })
